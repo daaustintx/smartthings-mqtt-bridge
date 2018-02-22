@@ -556,13 +556,24 @@ def inputHandler(evt) {
         log.debug "Ignoring event ${state.ignoreEvent}"
         state.ignoreEvent = false;
     }
-    else {
+    else {       
+        // If we're dealing with a button (even a single button device), 
+        // it's pretty likely that the data contains a buttonNumber specifying which button
+        def name = null
+        if ( evt.name == "button" ) {
+        	def data = parseJson(evt.data)
+        	name = "${evt.name} ${data.buttonNumber}"
+        }
+        else {
+        	name = evt.name
+        }
+        
         def json = new JsonOutput().toJson([
             path: "/push",
             body: [
                 name: evt.displayName,
                 value: evt.value,
-                type: evt.name
+                type: name
             ]
         ])
 
